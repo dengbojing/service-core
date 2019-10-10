@@ -1,0 +1,73 @@
+plugins {
+    id 'org.springframework.boot' version '2.1.4.RELEASE'
+}
+version = '0.0.1-SNAPSHOT'
+
+allprojects{
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    group 'com.yichen'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    ext{
+        springBootVersion="2.1.4.RELEASE"
+    }
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.6'
+        compile "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+        compile 'org.springframework.cloud:spring-cloud-starter-openfeign'
+        compile("org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}")
+        annotationProcessor 'org.projectlombok:lombok:1.18.6'
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+        compile("mysql:mysql-connector-java:8.0.16")
+        compile("org.aspectj:aspectjweaver:1.8.13")
+        compile("org.hibernate:hibernate-validator:6.0.13.Final")
+        compile("org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final")
+        // https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-redis
+        compile group: 'org.springframework.integration', name: 'spring-integration-redis', version: '5.0.7.RELEASE'
+        compile "org.springframework.boot:spring-boot-starter-data-redis:${springBootVersion}"
+    }
+    ext {
+        set('springCloudVersion', 'Greenwich.SR1')
+    }
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+
+    implementation project(':service-core-client')
+    implementation project(':common-util')
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation('org.springframework.cloud:spring-cloud-starter-zookeeper-all') {
+        exclude group: 'org.apache.zookeeper', module: 'zookeeper'
+    }
+    implementation('org.apache.zookeeper:zookeeper:3.4.12') {
+        exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    }
+
+
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    implementation group: 'org.springframework', name: 'spring-context'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.1'
+    runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+

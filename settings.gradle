@@ -1,0 +1,3 @@
+rootProject.name = 'service-core'
+include 'service-core-client'
+include 'common-util'
