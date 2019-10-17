@@ -1,4 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.yichen.config.CommonConfiguration,\
-com.yichen.exception.handler.GlobalExceptionHandler,\
-com.yichen.config.ApiAspectAutoConfigure
