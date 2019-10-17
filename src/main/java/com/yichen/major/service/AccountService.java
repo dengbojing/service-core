@@ -68,4 +68,18 @@ public interface AccountService {
      * @return 账户信息
      */
     Optional<AccountDTO> add(AccountParam accountParam);
+
+    /**
+     * 减少size账户使用次数
+     * @param userId 用户id
+     * @param size 减少次数
+     * @return 减少次数
+     */
+    Integer decrease(String userId, int size);
+
+    /**
+     * 检查用户是否拥有使用权限
+     * @param userId 用户id
+     */
+    void check(String userId);
 }

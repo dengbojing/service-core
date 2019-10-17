@@ -1,5 +1,6 @@
 package com.yichen.major.service.impl;
 
+import com.yichen.core.enums.ChargeTypeEnum;
 import com.yichen.exception.BusinessException;
 import com.yichen.major.entity.Account;
 import com.yichen.major.entity.Organization;
@@ -20,6 +21,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,5 +116,28 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.save(account);
         BeanUtils.copyProperties(account, dto,"password");
         return Optional.of(dto);
+    }
+
+    @Override
+    public Integer decrease(String userId, int size) {
+        accountRepository.findById(userId).ifPresent(account -> {
+            if(ChargeTypeEnum.COUNT.equals(account.getChargeType())){
+                Long count = account.getCount() - size;
+                account.setCount(count);
+            }
+        });
+        return size;
+    }
+
+    @Override
+    public void check(String userId) {
+        accountRepository.findById(userId).filter(account -> {
+            boolean open = account.getStatus().equals(AccountStatusEnum.OPEN);
+            if(ChargeTypeEnum.TIME.equals(account.getChargeType())){
+                return open && account.getEndDate() != null && account.getEndDate().compareTo(LocalDate.now()) >= 0;
+            }else{
+                return open && account.getCount() != null && account.getCount() > 0;
+            }
+        }).orElseThrow(() -> new BusinessException("使用期限已到,清联系管理人员购买!"));
     }
 }

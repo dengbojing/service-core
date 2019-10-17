@@ -50,6 +50,10 @@ com:
       enabled: true
     file:
       upload-dir: /data/upload/
+      tmp-dir: /data/tmp/
+      output-dir: /data/output/
+      api-key: TIzalHKGKoSLCs23tCxJoFAt_bvNI7nc
+      secret-key: nCk5XlcfthMIrnb00AEW_IfuRQcjG5AQ
 
 ---
 spring:

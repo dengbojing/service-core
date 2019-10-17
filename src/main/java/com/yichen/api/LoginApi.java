@@ -21,7 +21,7 @@ public class LoginApi {
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CommonResponse login(@RequestBody LoginParam loginParam){
+    public CommonResponse<?> login(@RequestBody LoginParam loginParam){
         return loginService.login(loginParam);
     }
 }

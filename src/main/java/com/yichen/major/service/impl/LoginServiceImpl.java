@@ -51,8 +51,8 @@ public class LoginServiceImpl implements LoginService {
     private JwtUtil jwtUtil;
 
     @Override
-    public CommonResponse login(LoginParam param) {
-        CommonResponse result = new CommonResponse();
+    public CommonResponse<LoginDTO> login(LoginParam param) {
+        CommonResponse<LoginDTO> result = new CommonResponse<>();
         LoginHistory loginHistory = new LoginHistory();
         loginHistory.setLoginName(param.getLoginName());
         // 用户是否存在
@@ -68,7 +68,7 @@ public class LoginServiceImpl implements LoginService {
         loginHistory.setCustomerId(account.getId());
         loginHistory.setOrganizationId(account.getOrganization().getId());
 
-        if (! AccountStatusEnum.OPEN.equals(account.getStatus())) {
+        if (!AccountStatusEnum.OPEN.equals(account.getStatus())) {
             result.setCode(253);
             result.setMessage("账户被冻结，请联系管理员");
             loginHistory.setStatus(LoginStatusEnum.ACCOUNT_FREEZE.name());
@@ -90,6 +90,7 @@ public class LoginServiceImpl implements LoginService {
         if (errorTime >= 5) {
             result.setCode(252);
             result.setMessage("账户因连续输入错误密码次数过多，请明日再试");
+            account.setStatus(AccountStatusEnum.FREEZE);
             loginHistory.setStatus(LoginStatusEnum.ACCOUNT_TEMP_FREEZE.name());
         }
 

@@ -1,9 +1,12 @@
 package com.yichen.major.service.impl;
 
+import com.google.common.collect.Lists;
 import com.yichen.config.properties.StorageProperties;
 import com.yichen.config.exception.FileStorageException;
 import com.yichen.config.exception.StorageFileNotFoundException;
+import com.yichen.exception.BusinessException;
 import com.yichen.major.entity.FileMartial;
+import com.yichen.major.manager.PhotoFixManager;
 import com.yichen.major.repo.FileRepository;
 import com.yichen.major.service.StorageService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,23 +41,35 @@ public class StorageServiceImpl implements StorageService {
 
     private final Path fileStorageLocation;
 
+    private final Path outputDir;
+
     private final String invalidCharacters = "..";
 
     private final FileRepository fileRepo;
 
+    private final PhotoFixManager photoFixManager;
+
 
     @Autowired
-    public StorageServiceImpl(StorageProperties storageProperties, FileRepository fileRepo) throws IOException {
+    public StorageServiceImpl(StorageProperties storageProperties, FileRepository fileRepo, PhotoFixManager photoFixManager) throws IOException {
         this.fileStorageLocation = Paths.get(storageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
+        this.outputDir = Paths.get(storageProperties.getOutputDir())
+                .toAbsolutePath().normalize();
         this.fileRepo = fileRepo;
-        if (!Files.exists(fileStorageLocation)) {
-            Files.createDirectories(fileStorageLocation);
+        this.photoFixManager = photoFixManager;
+        List<Path> list = Lists.newArrayList(fileStorageLocation,outputDir);
+        for (Path path : list) {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
         }
+
     }
 
     @Override
-    public String store(MultipartFile file) throws IOException {
+    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRED)
+    public String store(MultipartFile file,String userId) throws Exception {
         checkNotNull(file.getOriginalFilename());
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         FileMartial martial = new FileMartial();
@@ -59,14 +77,29 @@ public class StorageServiceImpl implements StorageService {
         martial.setSize(file.getSize());
         martial.setFileName(fileName);
         martial.setFilePath(fileStorageLocation.toString());
+        martial.setCustomerId(userId);
         if(fileName.contains(invalidCharacters)) {
             throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
         }
         fileRepo.save(martial);
-        Path targetLocation = this.fileStorageLocation.resolve(martial.getId());
+        String outputFileName = martial.getId() + photoFixManager.getPhotoSuffix(file.getContentType());
+        Path targetLocation = this.fileStorageLocation.resolve(outputFileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+        //photoFixManager.fixPhoto(targetLocation.toString(), tmpDir.toString(), outputDir.toString());
         return martial.getId();
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class,propagation = Propagation.REQUIRES_NEW)
+    public List<String> store(MultipartFile[] files,String userId) {
+        List<String> fileIds = Stream.of(files).map(file -> {
+            try {
+                return this.store(file,userId);
+            } catch (Exception e) {
+                throw new BusinessException("上传失败");
+            }
+        }).collect(Collectors.toList());
+        return fileIds;
     }
 
     @Override
@@ -82,14 +115,15 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public Resource loadAsResource(String fileName) {
         try {
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            FileMartial file = fileRepo.findById(fileName).orElseThrow(() ->  new StorageFileNotFoundException("FileMartial not found " + fileName));
+            Path filePath = this.outputDir.resolve(fileName+photoFixManager.getPhotoSuffix(file.getFileType())).normalize();
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 return resource;
             } else {
                 throw new StorageFileNotFoundException("FileMartial not found " + fileName);
             }
-        } catch (MalformedURLException ex) {
+        } catch (Exception ex) {
             throw new StorageFileNotFoundException("FileMartial not found " + fileName, ex);
         }
     }

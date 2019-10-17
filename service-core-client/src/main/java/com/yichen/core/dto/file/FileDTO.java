@@ -10,25 +10,37 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-@Slf4j
 public class FileDTO {
+
     private String id;
+    /**
+     * 文件名称
+     */
     private String fileName;
-    private String fileDownloadUri;
+
+    /**
+     * 文件存储路径
+     */
+    private String filePath;
+
+    /**
+     * 文件类型
+     */
     private String fileType;
+
+    /**
+     * 文件大小
+     */
     private Long size;
 
-    @Override
-    public String toString(){
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
-        }
-        return "";
-    }
+    /**
+     * 文件上传人id
+     */
+    private String customerId;
+
+    /**
+     * 订单id
+     */
+    private String orderId;
 }

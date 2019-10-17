@@ -15,6 +15,6 @@ public enum OrderStatusEnum {
     /**
      * 完成
      */
-    FINSIH;
+    FINISH;
 
 }

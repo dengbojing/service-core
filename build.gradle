@@ -60,8 +60,11 @@ dependencies {
     implementation('org.apache.zookeeper:zookeeper:3.4.12') {
         exclude group: 'org.slf4j', module: 'slf4j-log4j12'
     }
-
-
+    // https://mvnrepository.com/artifact/net.coobird/thumbnailator
+    implementation group: 'net.coobird', name: 'thumbnailator', version: '0.4.8'
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation group: 'org.json', name: 'json', version: '20180813'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // https://mvnrepository.com/artifact/org.springframework/spring-context
     implementation group: 'org.springframework', name: 'spring-context'
