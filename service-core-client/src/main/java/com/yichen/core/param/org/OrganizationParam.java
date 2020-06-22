@@ -13,6 +13,8 @@ import lombok.Setter;
 @Getter
 public class OrganizationParam extends AbstractParam {
 
+    private String id;
+
     private String name;
 
     private OrganizationTypeEnum type;

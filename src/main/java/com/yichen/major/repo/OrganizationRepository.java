@@ -18,5 +18,5 @@ public interface OrganizationRepository extends JpaRepository<Organization, Stri
      * @param pageable 分页参数
      * @return 分页结果
      */
-    Page<Organization> findByName(String name, Pageable pageable);
+    Page<Organization> findByNameLike(String name, Pageable pageable);
 }

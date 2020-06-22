@@ -1,8 +1,10 @@
 package com.yichen.major.service;
 
 import com.yichen.core.dto.account.AccountDTO;
+import com.yichen.core.dto.account.AppkeyDTO;
 import com.yichen.core.param.account.AccountParam;
 import com.yichen.core.param.account.AccountUpdateParam;
+import com.yichen.response.CommonResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -82,4 +84,18 @@ public interface AccountService {
      * @param userId 用户id
      */
     void check(String userId);
+
+    /**
+     * 获取密钥对
+     * @param accountParam 账户星系
+     * @return 密钥队
+     */
+    Optional<AppkeyDTO> getKey(AccountParam accountParam);
+
+    /**
+     * 生成新的密钥对
+     * @param accountParam 账户信息
+     * @return 密钥对
+     */
+    Optional<AppkeyDTO> generateKey(AccountParam accountParam);
 }

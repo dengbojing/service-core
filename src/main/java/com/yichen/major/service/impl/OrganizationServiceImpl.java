@@ -6,6 +6,7 @@ import com.yichen.major.entity.Organization;
 import com.yichen.major.repo.OrganizationRepository;
 import com.yichen.major.service.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,10 +52,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Page<OrganizationDTO> getByOrgName(OrganizationParam organizationParam) {
         PageRequest pageRequest = PageRequest.of(organizationParam.getPageParam().getNum(), organizationParam.getPageParam().getSize());
-        return organizationRepository.findByName(organizationParam.getName(), pageRequest).map(org -> {
+        return organizationRepository.findByNameLike(organizationParam.getName(), pageRequest).map(org -> {
             OrganizationDTO dto = new OrganizationDTO();
             BeanUtils.copyProperties(org, dto);
             return dto;
         });
+    }
+
+    @Override
+    public void saveOrUpdate(OrganizationParam param) {
+        Organization org = organizationRepository.findById(param.getId()).orElseGet(Organization::new);
+        BeanUtils.copyProperties(param,org);
+        organizationRepository.save(org);
     }
 }

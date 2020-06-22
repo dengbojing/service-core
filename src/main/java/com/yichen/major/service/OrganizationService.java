@@ -39,4 +39,10 @@ public interface OrganizationService {
      * @return 分页结果
      */
     Page<OrganizationDTO> getByOrgName(OrganizationParam organizationParam);
+
+    /**
+     * 添加或者更新组织机构
+     * @param param 组织机构参数
+     */
+    void saveOrUpdate(OrganizationParam param);
 }

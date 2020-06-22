@@ -2,15 +2,26 @@ package com.yichen.major.manager;
 
 import com.google.common.collect.Lists;
 import com.yichen.config.properties.StorageProperties;
+import com.yichen.core.param.file.FileParam;
+import com.yichen.core.param.order.OrderParam;
+import com.yichen.exception.BusinessException;
+import com.yichen.major.service.AccountService;
+import com.yichen.major.service.OrderService;
+import com.yichen.major.service.PhotoService;
+import com.yichen.major.service.StorageService;
+import com.yichen.util.SimpleMultipartFile;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import sScardPhotoFixer.ApiKey;
 import sScardPhotoFixer.SScardPhotoFixer;
 
+import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -33,7 +44,20 @@ public class PhotoFixManager {
 
     private final Path targetDir;
 
-    public PhotoFixManager(StorageProperties storageProperties) throws IOException {
+    private final AccountService accountService;
+
+    private final StorageService storageService;
+
+    @Resource
+    private OrderService orderService;
+
+    private final PhotoService photoService;
+
+
+    public PhotoFixManager(StorageProperties storageProperties, AccountService accountService,StorageService storageService,   PhotoService photoService) throws IOException {
+        this.accountService = accountService;
+        this.photoService = photoService;
+        this.storageService = storageService;
         ApiKey.setKey(storageProperties.getApiKey());
         ApiKey.setSecretKey(storageProperties.getSecretKey());
         this.tmpDir = Paths.get(storageProperties.getTmpDir())
@@ -53,17 +77,37 @@ public class PhotoFixManager {
         SScardPhotoFixer.fix1PhotoNoLog(sourceFileName,tmpDir.toString(),targetDir.toString());
     }
 
-    public String getPhotoSuffix(@NotNull String contentType){
+    public byte[] fixPhoto(FileParam param,String userId) throws Exception {
+        SimpleMultipartFile file = new SimpleMultipartFile(param.getFileName(), Base64.getDecoder().decode(param.getFileContent()));
+        String fileId = storageService.store(file,userId);
+        OrderParam orderParam = new OrderParam();
+        orderParam.setUserId(userId);
+        orderParam.setFileList(Lists.newArrayList(fileId));
+        orderService.create(orderParam)
+                .filter(param1-> StringUtils.isNotEmpty(param1.getId()))
+                .orElseThrow(() -> new BusinessException("转换出错!"));
+        photoService.save(orderParam.getFileList());
+        accountService.decrease(orderParam.getUserId(), 1);
+        return Files.readAllBytes(storageService.load(fileId));
+    }
+
+    public static String getPhotoSuffix(@NotNull String contentType){
         String suffix = "";
         if(X_PNG.equalsIgnoreCase(contentType) || PNG.equalsIgnoreCase(contentType)){
-            suffix = ".png";
+            suffix = SuffixHolder.PNG;
         }
         if(P_JPEG.equalsIgnoreCase(contentType) || JPEG.equalsIgnoreCase(contentType)){
-            suffix = ".jpg";
+            suffix = SuffixHolder.JPG;
         }
         if(BMP.equalsIgnoreCase(contentType)){
-            suffix = ".bmp";
+            suffix = SuffixHolder.BMP;
         }
         return suffix;
+    }
+
+    public static class SuffixHolder{
+        public static final String JPG = ".jpg";
+        public static final String PNG = ".png";
+        public static final String BMP = ".bmp";
     }
 }

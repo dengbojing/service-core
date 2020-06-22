@@ -1,9 +1,6 @@
 server:
   port: 8091
 spring:
-  cloud:
-    zookeeper:
-      connect-string: 121.41.2.219:2181
   profiles: dev
   application:
     name: service-core
@@ -24,7 +21,7 @@ spring:
       max-lifetime: 60000
   redis:
     host: 121.41.2.219
-    port: 6379
+    port: 63792
     database: 0
   jpa:
     show-sql: true

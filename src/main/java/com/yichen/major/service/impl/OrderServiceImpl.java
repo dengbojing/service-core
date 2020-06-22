@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private void generatePhoto(List<FileMartial> files,Order order) {
         files.forEach(fileMartial -> {
-            String fileName = fileMartial.getId() + photoFixManager.getPhotoSuffix(fileMartial.getFileType());
+            String fileName = fileMartial.getId() + PhotoFixManager.getPhotoSuffix(fileMartial.getFileType());
             Path path = Paths.get(fileMartial.getFilePath(), fileName);
             try {
                 photoFixManager.fixPhoto(path.toString());
@@ -105,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
      * @param status 改变后的订单状态
      */
     private void changeStatus(Order order, OrderStatusEnum status){
-        order = orderRepository.findById(order.getId()).orElseThrow(() -> new BusinessException("文件转换失败,订单创建失败!"));
+        order = orderRepository.findById(order.getId()).orElseThrow(() -> new BusinessException("订单修改状态失败!"));
         order.setOrderStatus(status);
         orderRepository.save(order);
 

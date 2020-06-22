@@ -1,10 +1,13 @@
 package com.yichen.major.service.impl;
 
+import com.yichen.core.dto.account.AppkeyDTO;
 import com.yichen.core.enums.ChargeTypeEnum;
 import com.yichen.exception.BusinessException;
 import com.yichen.major.entity.Account;
+import com.yichen.major.entity.AppKey;
 import com.yichen.major.entity.Organization;
 import com.yichen.major.repo.AccountRepository;
+import com.yichen.major.repo.AppKeyRepository;
 import com.yichen.major.repo.OrganizationRepository;
 import com.yichen.major.service.AccountService;
 import com.yichen.core.dto.account.AccountDTO;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.yichen.util.CustomBeanUtil.getNullPropertyNames;
@@ -42,11 +46,14 @@ public class AccountServiceImpl implements AccountService {
 
     private final PasswordUtil passwordUtil;
 
+    private final AppKeyRepository appKeyRepo;
+
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepository, OrganizationRepository organizationRepository, PasswordUtil passwordUtil) {
+    public AccountServiceImpl(AccountRepository accountRepository, OrganizationRepository organizationRepository, PasswordUtil passwordUtil, AppKeyRepository appKeyRepo) {
         this.accountRepository = accountRepository;
         this.organizationRepository = organizationRepository;
         this.passwordUtil = passwordUtil;
+        this.appKeyRepo = appKeyRepo;
     }
 
     @Override
@@ -139,5 +146,46 @@ public class AccountServiceImpl implements AccountService {
                 return open && account.getCount() != null && account.getCount() > 0;
             }
         }).orElseThrow(() -> new BusinessException("使用期限已到,清联系管理人员购买!"));
+    }
+
+    @Override
+    public Optional<AppkeyDTO> getKey(AccountParam accountParam) {
+        AppkeyDTO dto = new AppkeyDTO();
+        accountRepository.findById(accountParam.getUserId()).ifPresent(account -> {
+            if(!account.getStatus().equals(AccountStatusEnum.CLOSE)) {
+                AppKey appkey = appKeyRepo.findByAccount(account).orElseGet(()->{
+                    AppKey appkeyTemp = new AppKey();
+                    appkeyTemp.setAppKey(UUID.randomUUID().toString().replace("-",""));
+                    appkeyTemp.setSecretKey(UUID.randomUUID().toString().replace("-",""));
+                    appkeyTemp.setAccount(account);
+                    return appkeyTemp;
+                });
+                appKeyRepo.save(appkey);
+                dto.setAppKey(appkey.getAppKey());
+                dto.setSecretKey(appkey.getSecretKey());
+            }else{
+                throw new BusinessException("账户已经被冻结!");
+            }
+
+        });
+        return Optional.of(dto);
+    }
+
+    @Override
+    public Optional<AppkeyDTO> generateKey(AccountParam accountParam) {
+        AppkeyDTO dto = new AppkeyDTO();
+        accountRepository.findById(accountParam.getUserId()).ifPresent(account -> {
+            if(!account.getStatus().equals(AccountStatusEnum.CLOSE)) {
+                appKeyRepo.deleteByAccount(account);
+                AppKey appkey =  new AppKey();
+                appkey.setAppKey(UUID.randomUUID().toString().replace("-",""));
+                appkey.setSecretKey(UUID.randomUUID().toString().replace("-",""));
+                appkey.setAccount(account);
+                appKeyRepo.save(appkey);
+            }else{
+                throw new BusinessException("账户已经被冻结!");
+            }
+        });
+        return Optional.of(dto);
     }
 }

@@ -11,4 +11,8 @@ import lombok.Setter;
 @Getter
 public class FileParam extends AbstractParam {
     private String fileId;
+
+    private String fileContent;
+
+    private String fileName;
 }

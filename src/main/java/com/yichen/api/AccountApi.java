@@ -1,6 +1,8 @@
 package com.yichen.api;
 
+import com.yichen.core.dto.account.AppkeyDTO;
 import com.yichen.core.param.account.AccountIdsParam;
+import com.yichen.exception.BusinessException;
 import com.yichen.major.service.AccountService;
 import com.yichen.core.dto.account.AccountDTO;
 import com.yichen.core.param.account.AccountParam;
@@ -117,4 +119,25 @@ public class AccountApi {
     public CommonResponse<Page<AccountDTO>> getPage(@RequestBody AccountParam accountParam ){
         return CommonResponse.success(accountService.getPageByCondition(accountParam));
     }
+
+    /**
+     * 密钥生成
+     * @param accountParam 账户信息
+     * @return 密钥对
+     */
+    @PostMapping("/key/get")
+    public CommonResponse<AppkeyDTO> getKey(@RequestBody AccountParam accountParam){
+        return CommonResponse.success(accountService.getKey(accountParam).orElseThrow(() -> new BusinessException("获取失败!")));
+    }
+
+    /**
+     * 生成新的密钥对
+     * @param accountParam 账户信息
+     * @return 密钥对
+     */
+    @PostMapping("/key/generate")
+    public CommonResponse<AppkeyDTO> generateKey(@RequestBody AccountParam accountParam){
+        return CommonResponse.success(accountService.generateKey(accountParam).orElseThrow(() -> new BusinessException("生成失败!")));
+    }
+
 }

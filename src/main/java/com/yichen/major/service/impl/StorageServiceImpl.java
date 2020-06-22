@@ -47,17 +47,14 @@ public class StorageServiceImpl implements StorageService {
 
     private final FileRepository fileRepo;
 
-    private final PhotoFixManager photoFixManager;
-
 
     @Autowired
-    public StorageServiceImpl(StorageProperties storageProperties, FileRepository fileRepo, PhotoFixManager photoFixManager) throws IOException {
+    public StorageServiceImpl(StorageProperties storageProperties, FileRepository fileRepo) throws IOException {
         this.fileStorageLocation = Paths.get(storageProperties.getUploadDir())
                 .toAbsolutePath().normalize();
         this.outputDir = Paths.get(storageProperties.getOutputDir())
                 .toAbsolutePath().normalize();
         this.fileRepo = fileRepo;
-        this.photoFixManager = photoFixManager;
         List<Path> list = Lists.newArrayList(fileStorageLocation,outputDir);
         for (Path path : list) {
             if (!Files.exists(path)) {
@@ -82,7 +79,7 @@ public class StorageServiceImpl implements StorageService {
             throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
         }
         fileRepo.save(martial);
-        String outputFileName = martial.getId() + photoFixManager.getPhotoSuffix(file.getContentType());
+        String outputFileName = martial.getId() + PhotoFixManager.getPhotoSuffix(file.getContentType());
         Path targetLocation = this.fileStorageLocation.resolve(outputFileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         //photoFixManager.fixPhoto(targetLocation.toString(), tmpDir.toString(), outputDir.toString());
@@ -109,14 +106,14 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Path load(String fileName) {
-        return null;
+        FileMartial file = fileRepo.findById(fileName).orElseThrow(() ->  new StorageFileNotFoundException("FileMartial not found " + fileName));
+        return this.outputDir.resolve(fileName+PhotoFixManager.getPhotoSuffix(file.getFileType())).normalize();
     }
 
     @Override
     public Resource loadAsResource(String fileName) {
         try {
-            FileMartial file = fileRepo.findById(fileName).orElseThrow(() ->  new StorageFileNotFoundException("FileMartial not found " + fileName));
-            Path filePath = this.outputDir.resolve(fileName+photoFixManager.getPhotoSuffix(file.getFileType())).normalize();
+            Path filePath = this.load(fileName);
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 return resource;

@@ -1,9 +1,11 @@
 package com.yichen.core.client;
 
 import com.yichen.core.dto.account.AccountDTO;
+import com.yichen.core.dto.account.AppkeyDTO;
 import com.yichen.core.param.account.AccountIdsParam;
 import com.yichen.core.param.account.AccountParam;
 import com.yichen.core.param.account.AccountUpdateParam;
+import com.yichen.exception.BusinessException;
 import com.yichen.response.CommonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.domain.Page;
@@ -81,4 +83,20 @@ public interface AccountClient {
     @PostMapping("/page")
     CommonResponse<Page<AccountDTO>> getPage(@RequestBody AccountParam accountParam );
 
+
+    /**
+     * 密钥生成
+     * @param accountParam 账户信息
+     * @return 密钥对
+     */
+    @PostMapping("/key/get")
+    CommonResponse<AppkeyDTO> getKey(@RequestBody AccountParam accountParam);
+
+    /**
+     * 生成新的密钥对
+     * @param accountParam 账户信息
+     * @return 密钥对
+     */
+    @PostMapping("/key/generate")
+    CommonResponse<AppkeyDTO> generateKey(@RequestBody AccountParam accountParam);
 }

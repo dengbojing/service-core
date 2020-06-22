@@ -31,13 +31,11 @@ public class PhotoServiceImpl implements PhotoService {
 
     private final Path downloadPath;
 
-    private final PhotoFixManager photoFixManager;
 
-    public PhotoServiceImpl(PhotoRepository photoRepo, FileRepository fileRepo, StorageProperties storageProperties, PhotoFixManager photoFixManager) {
+    public PhotoServiceImpl(PhotoRepository photoRepo, FileRepository fileRepo, StorageProperties storageProperties) {
         this.photoRepo = photoRepo;
         this.fileRepo = fileRepo;
         this.downloadPath = Paths.get(storageProperties.getOutputDir());
-        this.photoFixManager = photoFixManager;
     }
 
 
@@ -47,7 +45,7 @@ public class PhotoServiceImpl implements PhotoService {
             Photo photo = new Photo();
             FileMartial file = fileRepo.findById(s).orElseGet(FileMartial::new);
             photo.setPhotoMartial(file);
-            Path path = Paths.get(downloadPath.toString(), file.getId() + photoFixManager.getPhotoSuffix(file.getFileType()));
+            Path path = Paths.get(downloadPath.toString(), file.getId() + PhotoFixManager.getPhotoSuffix(file.getFileType()));
             File fileTmp = new File(path.toUri());
             photo.setPhotoName(fileTmp.getName());
             photo.setPhotoPath(downloadPath.toString());

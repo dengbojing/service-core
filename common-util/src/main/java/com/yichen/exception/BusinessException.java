@@ -16,7 +16,7 @@ public class BusinessException extends RuntimeException {
     private Integer code = 500;
 
     /**
-     * Constructs a new runtime exception with the specified detail message.
+     * Constructs a new runtime exception with the specified detail message with out fillstacktrace.
      * The cause is not initialized, and may subsequently be initialized by a
      * call to {@link #initCause}.
      *
@@ -24,7 +24,7 @@ public class BusinessException extends RuntimeException {
      *                later retrieval by the {@link #getMessage()} method.
      */
     public BusinessException(String message) {
-        super(message);
+        super(message,null,false,false);
     }
 
     public BusinessException(String message, Throwable throwable){
