@@ -7,8 +7,11 @@ import com.yichen.major.service.AppKeyService;
 import com.yichen.request.RequestHolder;
 import com.yichen.response.CommonResponse;
 import com.yichen.util.OpenApiStatus;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +24,13 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author dengbojing
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class OpenApi {
     private final static String  TOKEN = "token";
     private final static String  TIME_SPAN = "timeSpan";
-    private final static String APP_KEY = "appKey";
+    private final static String  APP_KEY = "appKey";
 
     private final PhotoFixManager photoFixManager;
 
@@ -44,13 +48,15 @@ public class OpenApi {
      * @throws Exception
      */
     @PostMapping("/file")
-    public CommonResponse<?> uploadFile(@RequestBody FileParam param) throws Exception {
-        CommonResponse response;
+    public CommonResponse<?> uploadFile(@RequestBody @Validated FileParam param) throws Exception {
+        log.info("uploadFile request param length: {},{}",param.getFileName().length(), param.getFileContent().length());
+        CommonResponse<?> response ;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = null;
         if (null != requestAttributes) {
             request = (HttpServletRequest) (requestAttributes.resolveReference(RequestAttributes.REFERENCE_REQUEST));
         }
+
         String token = request.getHeader(TOKEN);
         String timeSpan = request.getHeader(TIME_SPAN);
         String appKey = request.getHeader(APP_KEY);
@@ -59,10 +65,15 @@ public class OpenApi {
             String userId = appKeyService.getAccountId(appKey);
             response = CommonResponse.success(photoFixManager.fixPhoto(param,userId));
         }else{
-            response = new CommonResponse();
+            response = new CommonResponse<String>();
             response.setCode(apiStatus.getCode());
             response.setMessage(apiStatus.getDesc());
         }
         return response;
+    }
+
+    @GetMapping("/hello")
+    public CommonResponse<?> hello(){
+        return CommonResponse.success("hello");
     }
 }

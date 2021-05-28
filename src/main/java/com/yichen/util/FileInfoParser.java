@@ -1,8 +1,5 @@
 package com.yichen.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author dengbojing
  */
@@ -40,8 +37,8 @@ public class FileInfoParser {
 
     public static class HeaderHolder{
         public static final String JPG = "FFD8FF";
-        public static final String BMP = "89504E47";
-        public static final String PNG = "424D";
+        public static final String PNG = "89504E47";
+        public static final String BMP = "424D";
     }
 
 

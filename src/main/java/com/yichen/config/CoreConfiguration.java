@@ -12,6 +12,8 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.integration.redis.util.RedisLockRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 
 import javax.annotation.Resource;
 
@@ -19,6 +21,7 @@ import javax.annotation.Resource;
  * @author dengbojing
  */
 @Configuration
+//@EnableWebSocket
 public class CoreConfiguration {
 
     @Resource
@@ -53,5 +56,10 @@ public class CoreConfiguration {
     @Bean
     public ChannelTopic topic() {
         return new ChannelTopic("messageQueue");
+    }
+
+    @Bean
+    public ServerEndpointExporter serverEndpointExporter(){
+        return new ServerEndpointExporter();
     }
 }

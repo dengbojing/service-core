@@ -43,7 +43,7 @@ public class CommonResponse<T> {
         return response.getData();
     }
 
-    public static void check(CommonResponse response) {
+    public static <T> void check(CommonResponse<T> response) {
         if (response.getCode() == null || !response.getCode().equals(ResponseCodeEnum.SUCCESS.code)) {
             throw new RuntimeException("服务调用失败：" + response.getMessage());
         }
@@ -60,7 +60,7 @@ public class CommonResponse<T> {
          */
         FAIL(500);
 
-        private Integer code;
+        private final Integer code;
 
         ResponseCodeEnum(int code) {
             this.code = code;

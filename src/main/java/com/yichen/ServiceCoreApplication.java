@@ -25,7 +25,7 @@ public class ServiceCoreApplication {
 
     public static void main(String[] args) {
         new SpringApplicationBuilder()
-                .environment(new StandardEncryptableEnvironment())
+                //.environment(new StandardEncryptableEnvironment())
                 .sources(ServiceCoreApplication.class).run(args);
     }
 

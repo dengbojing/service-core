@@ -1,5 +1,6 @@
 package com.yichen.major.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.yichen.major.entity.AppKey;
 import com.yichen.major.repo.AppKeyRepository;
 import com.yichen.major.service.AppKeyService;
@@ -26,6 +27,7 @@ public class AppKeyServiceImpl implements AppKeyService {
 
     @Override
     public OpenApiStatus check(String key,String token,Long timeSpan) {
+        log.info("key is {}, token is {}",key ,token);
         OpenApiStatus status = OpenApiStatus.TIME_EXPIRED;
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(key) || timeSpan == null){
             status = OpenApiStatus.EMPTY_HEADER;
@@ -35,13 +37,15 @@ public class AppKeyServiceImpl implements AppKeyService {
             AppKey appKey = appKeyRepo.findByAppKey(key).orElseGet(AppKey::new);
             if(StringUtils.isEmpty(appKey.getId()) || appKey.getAccount() == null){
                 status = OpenApiStatus.APP_KEY_EXPIRED;
-            }
-            secretKey.append(appKey.getSecretKey());
-            String validateToken = DigestUtils.md5DigestAsHex(key.concat(timeSpan+"").concat(secretKey.toString()).getBytes());
-            if( token.equalsIgnoreCase(validateToken)){
-                status = OpenApiStatus.OK;
             }else{
-                status = OpenApiStatus.VALIDATE_FAILURE;
+                secretKey.append(appKey.getSecretKey());
+                String validateToken = DigestUtils.md5DigestAsHex(key.concat(timeSpan+"").concat(secretKey.toString()).getBytes());
+                log.info("find appKey Object {} , secretKey is {}", JSON.toJSONString(appKey.getAccount().getName()), secretKey);
+                if( token.equalsIgnoreCase(validateToken)){
+                    status = OpenApiStatus.OK;
+                }else{
+                    status = OpenApiStatus.VALIDATE_FAILURE;
+                }
             }
         }
         return status;

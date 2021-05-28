@@ -24,7 +24,7 @@ public class ServiceProjectApplicationTests {
     public void getPass() {
         String url = encryptor.encrypt("jdbc:mysql://121.41.2.219:3306/yichen_manager?characterEncoding=utf-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&serverTimezone=UTC");
         String name = encryptor.encrypt("root");
-        String password = encryptor.encrypt(" mnnn8e");
+        String password = encryptor.encrypt("1234qwer");
         System.out.println(url);
         System.out.println(name);
         System.out.println(password);

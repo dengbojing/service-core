@@ -2,7 +2,7 @@ plugins {
     id 'maven-publish'
 }
 
-version '0.0.4-SNAPSHOT'
+version '0.0.5-SNAPSHOT'
 
 dependencies {
     compileOnly 'org.projectlombok:lombok:1.16.22'

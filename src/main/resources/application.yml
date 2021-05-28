@@ -10,9 +10,9 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
   datasource:
-    url: ENC(5FpHsKlQ9l8uwe63pY3GhBOfGAYfcRCqPstEvuJ5yV8ol8a0oZxLRmOpK9igDvELuRFYqK+AYSwawyDBxx26HZiDUwluN/IQwI1ZOBiRy1BkJk5jNezBpQX6Yo1CyODMFEcT+4TNW1k/ii+3UvZ/8Of0RisGfZyJNdeyhnM70+pE7SKmRtLsVNAeR9ayCaG5fNKyhS/CtKNnikoMtRWBRQv1ej+mccnOxfboTPRO/xcbLGScJZWXcIKh7CvROzWY)
-    username: ENC(PO/MxABOlUrFRM1A2D2ziQ==)
-    password: ENC(E+exasNSCkNcLunfhmTUsKgf6UK3gl1y)
+    url: jdbc:mysql://121.41.2.219:3306/yichen_photo?characterEncoding=utf-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: 1234qwer
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-timeout: 30000
