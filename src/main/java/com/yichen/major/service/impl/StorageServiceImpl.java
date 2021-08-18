@@ -43,8 +43,6 @@ public class StorageServiceImpl implements StorageService {
 
     private final Path outputDir;
 
-    private final String invalidCharacters = "..";
-
     private final FileRepository fileRepo;
 
 
@@ -75,6 +73,7 @@ public class StorageServiceImpl implements StorageService {
         martial.setFileName(fileName);
         martial.setFilePath(fileStorageLocation.toString());
         martial.setCustomerId(userId);
+        String invalidCharacters = "..";
         if(fileName.contains(invalidCharacters)) {
             throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
         }

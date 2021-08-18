@@ -92,7 +92,7 @@ public class SpringTest {
         //System.out.println(Base64.getEncoder().encodeToString(b));
         String key = "ff3d3106a97e4e798dfc5926b2c4e54a";
         String secretKey = "9a6d394e7fb8479ea0a92e5caa15c9a5";
-        String requestUrl = "http://localhost:8090/core/api/v1/file";
+        String requestUrl = "http://rsjrxcjcl.weihai.cn/core/api/v1/file";
         Map<String,String> map = new HashMap<>();
         map.put("fileName","1.jpg");
         map.put("fileContent",Base64.getEncoder().encodeToString(b));
@@ -107,7 +107,8 @@ public class SpringTest {
         HttpResponse<String> httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         if(httpResponse.statusCode() == 200){
             JSONObject jsonObj = JSON.parseObject(httpResponse.body());
-            Files.write(Paths.get("C:\\Users\\weigx\\Desktop\\归档\\\\4323.jpg"),Base64.getDecoder().decode(jsonObj.getString("data")), StandardOpenOption.CREATE);
+            System.out.println(jsonObj.toJSONString());
+            Files.write(Paths.get("C:\\Users\\weigx\\Desktop\\归档\\4323.jpg"),Base64.getDecoder().decode(jsonObj.getString("data")), StandardOpenOption.CREATE);
         }
 
 
