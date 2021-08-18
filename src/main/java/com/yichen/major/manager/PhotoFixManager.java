@@ -79,6 +79,13 @@ public class PhotoFixManager {
 
     public byte[] fixPhoto(FileParam param,String userId) throws Exception {
         SimpleMultipartFile file = new SimpleMultipartFile(param.getFileName(), Base64.getDecoder().decode(param.getFileContent()));
+        if(file.getSize() < 14 * 1024 || file.getSize() > 40 * 1024){
+            throw new BusinessException("文件大小必须在14-40k之间");
+        }
+        if(file.getWidth() != 358 && file.getHeight() != 411){
+            throw new BusinessException("文件尺寸不符合要求，要求尺寸为：宽：358，高：411。");
+        }
+
         String fileId = storageService.store(file,userId);
         OrderParam orderParam = new OrderParam();
         orderParam.setUserId(userId);
