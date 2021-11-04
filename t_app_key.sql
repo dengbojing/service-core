@@ -1,0 +1,2 @@
+INSERT INTO `t_app_key` VALUES ('b8addd8d-2526-4df0-9e8f-001047090373', '2019-10-22 08:23:57', 'system', '2019-10-22 08:23:57', 'system', '3a1255e7607f43b4bd9325a8cda65166', NULL, 'c4007509e3754562afaa94b5b6284786', '1');
+INSERT INTO `t_app_key` VALUES ('b8addd8d-2526-4df0-9e8f-001047090372', '2020-7-10 19:09:19', 'system', '2020-7-10 19:09:21', 'system', 'ff3d3106a97e4e798dfc5926b2c4e54a', NULL, '9a6d394e7fb8479ea0a92e5caa15c9a5', '2');

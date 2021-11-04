@@ -1,0 +1,2 @@
+INSERT INTO `t_account` VALUES ('1', '2019-10-9 20:00:26', 'system', '2021-5-26 13:37:57', 'system', 'COUNT', 986797, 'dengbojing@qq.com', '1994-11-12', 'dengbojing', '邓博静', '2521e73c4d9a1d25da25cc1d17cc8a44', '18511708987', '1983-8-17', 0, '1');
+INSERT INTO `t_account` VALUES ('2', '2020-7-10 18:50:43', 'system', '2021-5-26 10:22:02', 'system', 'COUNT', 999444, 'admin@qq.com', '2028-1-2', 'admin', 'admin', '2521e73c4d9a1d25da25cc1d17cc8a44', '12345678901', '2019-1-2', 0, '1');
